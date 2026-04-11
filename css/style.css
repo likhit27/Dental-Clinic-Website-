@@ -1,12 +1,12 @@
 :root {
   /* Colors */
-  --color-navy: #0d1f3c;
-  --color-teal: #1a7f8e;
-  --color-gold: #c9a84c;
-  --color-gold-hover: #b4943c;
+  --color-navy: #1a3a5c;
+  --color-teal: #5ba4e6;
+  --color-gold: #2e86c1;
+  --color-gold-hover: #21618c;
   --color-white: #ffffff;
-  --color-gray: #e2e8f0;
-  --color-navy-dark: #09152b;
+  --color-gray: #f0f8ff;
+  --color-navy-dark: #112a46;
 
   /* Typography */
   --font-heading: 'Cormorant Garamond', serif;
