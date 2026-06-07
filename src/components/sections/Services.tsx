@@ -25,9 +25,6 @@ export function Services() {
             >
               <h4 className="service-title">{service.title}</h4>
               <p className="service-desc">{service.description}</p>
-              <a href="#" className="service-link">
-                Learn More {'\u2192'}
-              </a>
             </div>
           ))}
         </div>
