@@ -62,18 +62,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (appointmentForm) {
-        appointmentForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent actual submission
+        appointmentForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
 
-            // Show success message
-            formSuccess.classList.remove('hidden');
+            const btn = appointmentForm.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = 'Sending...';
+            btn.disabled = true;
 
-            // Reset the form
-            appointmentForm.reset();
+            const data = {
+                firstName: document.getElementById('fname').value.trim(),
+                lastName:  document.getElementById('lname').value.trim(),
+                phone:     document.getElementById('phone').value.trim(),
+                email:     document.getElementById('email').value.trim(),
+                date:      document.getElementById('date').value,
+                time:      document.getElementById('time').value,
+                service:   document.getElementById('service').value,
+                message:   document.getElementById('message').value.trim(),
+            };
 
-            setTimeout(() => {
-                formSuccess.classList.add('hidden');
-            }, 5000);
+            try {
+                const res = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                if (res.ok) {
+                    formSuccess.classList.remove('hidden');
+                    appointmentForm.reset();
+                    setTimeout(() => formSuccess.classList.add('hidden'), 6000);
+                } else {
+                    const err = await res.json();
+                    alert('Something went wrong: ' + (err.error || 'Please try again.'));
+                }
+            } catch (networkErr) {
+                alert('Network error. Please check your connection and try again.');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
         });
     }
 
