@@ -9,19 +9,25 @@ import {
   FacebookIcon,
   GoogleIcon,
   InstagramIcon,
-  LinkedInIcon,
-  TwitterIcon,
-  WhatsAppIcon,
 } from '../icons/SvgIcons';
 import { SectionHeader } from '../ui/SectionHeader';
 
 const socialLinks = [
-  { label: 'Facebook', href: '#', icon: FacebookIcon },
-  { label: 'Instagram', href: '#', icon: InstagramIcon },
-  { label: 'Twitter/X', href: '#', icon: TwitterIcon },
-  { label: 'LinkedIn', href: '#', icon: LinkedInIcon },
-  { label: 'Google', href: '#', icon: GoogleIcon },
-  { label: 'WhatsApp', href: '#', icon: WhatsAppIcon },
+  {
+    label: 'Review Mani Dental Clinic on Google',
+    href: 'https://g.page/r/Cd6y_vygff6JEA0',
+    icon: GoogleIcon,
+  },
+  {
+    label: 'Mani Dental Clinic on Facebook',
+    href: 'https://www.facebook.com/Mani-Dental-Clinic-802996813219563',
+    icon: FacebookIcon,
+  },
+  {
+    label: 'Mani Dental Clinic on Instagram',
+    href: 'https://www.instagram.com/dentalmani/',
+    icon: InstagramIcon,
+  },
 ];
 
 export function Appointment() {
@@ -140,7 +146,13 @@ export function Appointment() {
 
             <div className="social-links">
               {socialLinks.map(({ href, icon: Icon, label }) => (
-                <a href={href} aria-label={label} key={label}>
+                <a
+                  href={href}
+                  aria-label={label}
+                  key={label}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Icon />
                 </a>
               ))}
