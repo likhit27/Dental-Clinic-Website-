@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -8,18 +7,18 @@ export default async function handler(req, res) {
 
   const { firstName, lastName, phone, email, date, time, service, message } = req.body;
 
-  // Basic validation
   if (!firstName || !phone || !service) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const results = { notion: false, telegram: false };
+  const results = { notion: false, telegram: false, notionError: null };
 
   try {
     await addToNotion({ firstName, lastName, phone, email, date, time, service, message });
     results.notion = true;
   } catch (err) {
     console.error('Notion error:', err.message);
+    results.notionError = err.message; // expose error in response for debugging
   }
 
   try {
@@ -29,17 +28,18 @@ export default async function handler(req, res) {
     console.error('Telegram error:', err.message);
   }
 
-  if (!results.notion && !results.telegram) {
-    return res.status(500).json({ error: 'Both integrations failed. Check server logs.' });
-  }
-
   res.status(200).json({ success: true, results });
 }
 
 // ─── NOTION ───────────────────────────────────────────────────────────────────
 async function addToNotion(data) {
-  const NOTION_TOKEN   = process.env.NOTION_TOKEN;
-  const NOTION_DB_ID   = process.env.NOTION_DATABASE_ID;
+  const NOTION_TOKEN = process.env.NOTION_TOKEN;
+  const NOTION_DB_ID = process.env.NOTION_DATABASE_ID;
+
+  // Log env var presence (not values) to help debug
+  console.log('NOTION_TOKEN present:', !!NOTION_TOKEN);
+  console.log('NOTION_DB_ID present:', !!NOTION_DB_ID);
+  console.log('NOTION_DB_ID value:', NOTION_DB_ID);
 
   const serviceLabels = {
     preventive:  'Preventive Dentistry',
@@ -66,6 +66,41 @@ async function addToNotion(data) {
     '5pm':  '5:00 PM - 6:00 PM',
   };
 
+  const payload = {
+    parent: { database_id: NOTION_DB_ID },
+    properties: {
+      'Name': {
+        title: [{ text: { content: `${data.firstName} ${data.lastName}` } }]
+      },
+      'Phone': {
+        phone_number: data.phone
+      },
+      'Email': {
+        email: data.email || null
+      },
+      'Service': {
+        select: { name: serviceLabels[data.service] || data.service }
+      },
+      'Preferred Date': {
+        date: data.date ? { start: data.date } : null
+      },
+      'Preferred Time': {
+        select: { name: timeLabels[data.time] || data.time || 'Not specified' }
+      },
+      'Message': {
+        rich_text: [{ text: { content: data.message || '' } }]
+      },
+      'Status': {
+        select: { name: '🆕 New' }
+      },
+      'Submitted At': {
+        date: { start: new Date().toISOString() }
+      },
+    },
+  };
+
+  console.log('Sending to Notion DB:', NOTION_DB_ID);
+
   const response = await fetch('https://api.notion.com/v1/pages', {
     method: 'POST',
     headers: {
@@ -73,44 +108,15 @@ async function addToNotion(data) {
       'Content-Type': 'application/json',
       'Notion-Version': '2022-06-28',
     },
-    body: JSON.stringify({
-      parent: { database_id: NOTION_DB_ID },
-      properties: {
-        // "Name" is the title column — shows as the main row identifier
-        'Name': {
-          title: [{ text: { content: `${data.firstName} ${data.lastName}` } }]
-        },
-        'Phone': {
-          phone_number: data.phone
-        },
-        'Email': {
-          email: data.email || null
-        },
-        'Service': {
-          select: { name: serviceLabels[data.service] || data.service }
-        },
-        'Preferred Date': {
-          date: data.date ? { start: data.date } : null
-        },
-        'Preferred Time': {
-          select: { name: timeLabels[data.time] || data.time || 'Not specified' }
-        },
-        'Message': {
-          rich_text: [{ text: { content: data.message || '' } }]
-        },
-        'Status': {
-          select: { name: '🆕 New' }
-        },
-        'Submitted At': {
-          date: { start: new Date().toISOString() }
-        },
-      },
-    }),
+    body: JSON.stringify(payload),
   });
 
+  const responseText = await response.text();
+  console.log('Notion response status:', response.status);
+  console.log('Notion response body:', responseText);
+
   if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Notion API error: ${err}`);
+    throw new Error(`Notion API error ${response.status}: ${responseText}`);
   }
 }
 
