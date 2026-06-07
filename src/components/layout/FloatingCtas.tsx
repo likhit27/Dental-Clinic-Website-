@@ -1,7 +1,15 @@
+import { clinicContact } from '@/data/siteContent';
+
 export function FloatingCtas() {
   return (
     <div className="floating-ctas">
-      <a href="tel:+919876543210" className="btn-float btn-float-call" aria-label="Call Now">
+      <a
+        href={clinicContact.whatsappUrl}
+        className="btn-float btn-float-call"
+        aria-label="Chat on WhatsApp"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <span className="btn-float-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none">
             <path

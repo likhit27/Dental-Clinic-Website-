@@ -1,4 +1,4 @@
-import { heroStats, trustItems } from '@/data/siteContent';
+import { clinicContact, heroStats, trustItems } from '@/data/siteContent';
 
 import { DecorativeIcon } from '../ui/DecorativeIcon';
 
@@ -22,7 +22,12 @@ export function Hero() {
             <a href="#appointment" className="btn btn-primary">
               Book Appointment
             </a>
-            <a href="tel:+910000000000" className="btn btn-outline">
+            <a
+              href={clinicContact.whatsappUrl}
+              className="btn btn-outline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Call Now
             </a>
           </div>

@@ -69,6 +69,15 @@ export interface ContactCard {
   note?: string;
 }
 
+const whatsappMessage = encodeURIComponent(
+  'Hello Mani Dental Clinic, I would like to book an appointment.',
+);
+
+export const clinicContact = {
+  phoneLabel: '+91 98765 43210',
+  whatsappUrl: `https://wa.me/919876543210?text=${whatsappMessage}`,
+};
+
 export const navLinks: NavLink[] = [
   { id: 'home', href: '#home', label: 'Home' },
   { id: 'about', href: '#about', label: 'About Us' },
@@ -365,7 +374,7 @@ export const contactCards: ContactCard[] = [
   {
     title: 'Call Us',
     content: [],
-    link: { href: 'tel:+919876543210', label: '+91 98765 43210' },
+    link: { href: clinicContact.whatsappUrl, label: clinicContact.phoneLabel, external: true },
   },
 ];
 
