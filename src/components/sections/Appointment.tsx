@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { FormEvent } from 'react';
+import type { FocusEvent, FormEvent, PointerEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { appointmentTimes, contactCards, serviceOptions } from '@/data/siteContent';
@@ -38,6 +38,24 @@ export function Appointment() {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
+
+  const keepDatePickerInView = (
+    event: FocusEvent<HTMLInputElement> | PointerEvent<HTMLInputElement>,
+  ) => {
+    if (!window.matchMedia('(max-width: 768px)').matches) {
+      return;
+    }
+
+    const field = event.currentTarget;
+
+    window.requestAnimationFrame(() => {
+      field.scrollIntoView({
+        block: 'center',
+        inline: 'nearest',
+        behavior: 'smooth',
+      });
+    });
+  };
 
   useEffect(() => {
     return () => {
@@ -208,7 +226,15 @@ export function Appointment() {
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="date">Preferred Date</label>
-                  <input type="date" id="date" name="date" min={today} required />
+                  <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    min={today}
+                    required
+                    onFocus={keepDatePickerInView}
+                    onPointerDown={keepDatePickerInView}
+                  />
                 </div>
                 <div className="form-group">
                   <label htmlFor="time">Preferred Time</label>

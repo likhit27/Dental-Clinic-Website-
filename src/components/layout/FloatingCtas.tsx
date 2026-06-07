@@ -1,8 +1,14 @@
+import clsx from 'clsx';
+
 import { clinicContact } from '@/data/siteContent';
 
-export function FloatingCtas() {
+interface FloatingCtasProps {
+  activeSection: string;
+}
+
+export function FloatingCtas({ activeSection }: FloatingCtasProps) {
   return (
-    <div className="floating-ctas">
+    <div className={clsx('floating-ctas', activeSection === 'home' && 'floating-ctas-home')}>
       <a
         href={clinicContact.whatsappUrl}
         className="btn-float btn-float-call"

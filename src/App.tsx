@@ -31,7 +31,7 @@ function App() {
         <Appointment />
       </main>
       <Footer />
-      <FloatingCtas />
+      <FloatingCtas activeSection={activeSection} />
     </>
   );
 }
