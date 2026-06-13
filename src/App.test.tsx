@@ -20,4 +20,18 @@ describe('App', () => {
 
     expect(screen.getByText(/credit\/debit cards/i)).toBeInTheDocument();
   });
+
+  it('shows appointment validation errors before submitting', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /request appointment/i }));
+
+    expect(screen.getByText(/first name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/last name is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/phone number is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/preferred date is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/preferred time is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/service is required/i)).toBeInTheDocument();
+  });
 });

@@ -25,6 +25,10 @@ const timeLabels = {
   '5pm': '5:00 PM - 6:00 PM',
 };
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const namePattern = /^[\p{L}][\p{L} .'-]*$/u;
+const maxMessageLength = 600;
+
 export default async function handler(req, res) {
   res.setHeader('Allow', 'POST, OPTIONS');
 
@@ -117,10 +121,12 @@ async function readRequestBody(req) {
 }
 
 function normalizeAppointment(rawData) {
+  const rawPhone = cleanString(rawData.phone, 40);
+
   return {
     firstName: cleanString(rawData.firstName, 80),
     lastName: cleanString(rawData.lastName, 80),
-    phone: cleanString(rawData.phone, 40),
+    phone: formatIndianMobile(rawPhone) || rawPhone,
     email: cleanString(rawData.email, 120),
     date: cleanString(rawData.date, 40),
     time: cleanString(rawData.time, 40),
@@ -137,21 +143,106 @@ function cleanString(value, maxLength) {
   return value.trim().slice(0, maxLength);
 }
 
+function getIndianMobileDigits(phone) {
+  const digits = phone.replace(/\D/g, '');
+
+  if (digits.length === 12 && digits.startsWith('91')) {
+    return digits.slice(2);
+  }
+
+  if (digits.length === 11 && digits.startsWith('0')) {
+    return digits.slice(1);
+  }
+
+  return digits;
+}
+
+function formatIndianMobile(phone) {
+  const mobileDigits = getIndianMobileDigits(phone);
+
+  if (!/^[6-9]\d{9}$/.test(mobileDigits)) {
+    return '';
+  }
+
+  return `+91 ${mobileDigits.slice(0, 5)} ${mobileDigits.slice(5)}`;
+}
+
+function isValidDateValue(dateValue) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+    return false;
+  }
+
+  const [year, month, day] = dateValue.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
 function validateAppointment(data) {
   if (!data.firstName) {
     return 'First name is required.';
+  }
+
+  if (data.firstName.length < 2 || !namePattern.test(data.firstName)) {
+    return 'Please provide a valid first name.';
+  }
+
+  if (!data.lastName) {
+    return 'Last name is required.';
+  }
+
+  if (data.lastName.length < 2 || !namePattern.test(data.lastName)) {
+    return 'Please provide a valid last name.';
   }
 
   if (!data.phone) {
     return 'Phone number is required.';
   }
 
+  if (!formatIndianMobile(data.phone)) {
+    return 'Please provide a valid 10-digit Indian mobile number.';
+  }
+
+  if (data.email && !emailPattern.test(data.email)) {
+    return 'Please provide a valid email address.';
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+
+  if (!data.date) {
+    return 'Preferred date is required.';
+  }
+
+  if (!isValidDateValue(data.date)) {
+    return 'Please provide a valid preferred date.';
+  }
+
+  if (data.date < today) {
+    return 'Preferred date cannot be in the past.';
+  }
+
+  if (!data.time) {
+    return 'Preferred time is required.';
+  }
+
+  if (!timeLabels[data.time]) {
+    return 'Please choose a valid appointment time.';
+  }
+
   if (!data.service) {
     return 'Service is required.';
   }
 
-  if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-    return 'Please provide a valid email address.';
+  if (!serviceLabels[data.service]) {
+    return 'Please choose a valid service.';
+  }
+
+  if (data.message.length > maxMessageLength) {
+    return `Please keep the message under ${maxMessageLength} characters.`;
   }
 
   return null;

@@ -73,9 +73,19 @@ const whatsappMessage = encodeURIComponent(
   'Hello Mani Dental Clinic, I would like to book an appointment.',
 );
 
+const clinicAddress =
+  'Mani Dental Clinic, 21, City Station Road, Ground Floor, Toran Bowari, near Surajpole, Udaipur 313001';
+const clinicLatitude = 24.57795084318203;
+const clinicLongitude = 73.69751956569166;
+
 export const clinicContact = {
-  phoneLabel: '+91 98765 43210',
-  whatsappUrl: `https://wa.me/919876543210?text=${whatsappMessage}`,
+  phoneLabel: '+91 99833 99913',
+  whatsappUrl: `https://wa.me/919983399913?text=${whatsappMessage}`,
+  address: clinicAddress,
+  latitude: clinicLatitude,
+  longitude: clinicLongitude,
+  directionsUrl: 'https://maps.app.goo.gl/DGeam9bUeKhdEgyk8',
+  mapEmbedUrl: `https://www.google.com/maps?q=${clinicLatitude},${clinicLongitude}&z=17&output=embed`,
 };
 
 export const navLinks: NavLink[] = [
@@ -358,8 +368,13 @@ export const galleryItems: GalleryItem[] = [
 export const contactCards: ContactCard[] = [
   {
     title: 'Visit Us',
-    content: ['Mani Dental Clinic,', 'Sector 4, Udaipur, RJ 313001'],
-    link: { href: 'https://maps.google.com', label: 'Get Directions \u2192', external: true },
+    content: [
+      'Mani Dental Clinic,',
+      '21, City Station Road, Ground Floor,',
+      'Toran Bowari, near Surajpole,',
+      'Udaipur, RJ 313001',
+    ],
+    link: { href: clinicContact.directionsUrl, label: 'Get Directions \u2192', external: true },
   },
   {
     title: 'Clinic Hours',

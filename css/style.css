@@ -1771,6 +1771,28 @@ a {
   box-shadow: 0 0 0 3px rgba(26, 127, 142, 0.1);
 }
 
+.appointment-form input[aria-invalid='true'],
+.appointment-form select[aria-invalid='true'],
+.appointment-form textarea[aria-invalid='true'] {
+  border-color: #e11d48;
+  background-color: #fff7f8;
+}
+
+.appointment-form input[aria-invalid='true']:focus,
+.appointment-form select[aria-invalid='true']:focus,
+.appointment-form textarea[aria-invalid='true']:focus {
+  border-color: #e11d48;
+  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.12);
+}
+
+.field-error {
+  margin-top: 0.45rem;
+  color: #be123c;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: var(--leading-snug);
+}
+
 .btn-teal-gradient {
   width: 100%;
   margin-top: 1rem;
